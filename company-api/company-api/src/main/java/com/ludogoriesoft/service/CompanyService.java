@@ -7,6 +7,7 @@ import com.ludogoriesoft.repository.CompanyRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,5 +57,31 @@ public class CompanyService {
         return companies.stream()
                 .map(companyMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Updates an existing company in the database.
+     * This method is transactional.
+     *
+     * @param id The ID of the company to update.
+     * @param companyDto The DTO with the updated data.
+     * @return The DTO of the updated company.
+     * @throws NotFoundException if no company with the given ID is found.
+     */
+    @Transactional
+    public CompanyDto updateCompany(Long id, CompanyDto companyDto) {
+        // 1. Find the existing company by its ID.
+        Company companyToUpdate = companyRepository.findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Company with id " + id + " not found"));
+
+        // 2. Use our new mapper method to update the entity's fields.
+        companyMapper.updateEntityFromDto(companyDto, companyToUpdate);
+
+        // 3. Persist the changes. While not always strictly necessary for managed entities
+        // within a transaction, it's an explicit and safe way to ensure the update happens.
+        companyRepository.persist(companyToUpdate);
+
+        // 4. Map the updated entity back to a DTO and return it.
+        return companyMapper.toDto(companyToUpdate);
     }
 }

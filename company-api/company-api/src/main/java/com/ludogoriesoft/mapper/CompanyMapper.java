@@ -47,4 +47,23 @@ public class CompanyMapper {
                 entity.createdAt
         );
     }
+
+    /**
+     * Updates an existing Company entity with data from a CompanyDto.
+     *
+     * @param dto The DTO containing the new data.
+     * @param entity The existing entity fetched from the database to be updated.
+     */
+    public void updateEntityFromDto(CompanyDto dto, Company entity) {
+        if (dto == null || entity == null) {
+            return;
+        }
+        // We only update the fields that are allowed to be changed.
+        // 'id' and 'createdAt' are never updated from an incoming request.
+        entity.name = dto.name();
+        entity.country = dto.country();
+        entity.symbol = dto.symbol();
+        entity.website = dto.website();
+        entity.email = dto.email();
+    }
 }

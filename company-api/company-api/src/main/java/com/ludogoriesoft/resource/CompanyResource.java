@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.PathParam;
 
 import java.util.List;
 
@@ -45,5 +46,20 @@ public class CompanyResource {
     @GET
     public List<CompanyDto> getAllCompanies() {
         return companyService.getAllCompanies();
+    }
+
+    /**
+     * Endpoint for updating an existing company.
+     * Corresponds to: PUT /companies/{id}
+     *
+     * @param id The ID of the company from the URL path.
+     * @param companyDto The updated company data from the request body.
+     * @return An HTTP 200 OK response with the updated company's data.
+     */
+    @PUT
+    @Path("/{id}")
+    public Response updateCompany(@PathParam("id") Long id, @Valid CompanyDto companyDto) {
+        CompanyDto updatedCompany = companyService.updateCompany(id, companyDto);
+        return Response.ok(updatedCompany).build();
     }
 }
