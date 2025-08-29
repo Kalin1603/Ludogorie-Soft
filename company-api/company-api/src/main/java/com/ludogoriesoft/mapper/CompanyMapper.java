@@ -1,7 +1,9 @@
 package com.ludogoriesoft.mapper;
 
 import com.ludogoriesoft.dto.CompanyDto;
+import com.ludogoriesoft.dto.CompanyStockDto;
 import com.ludogoriesoft.entity.Company;
+import com.ludogoriesoft.entity.StockData;
 import jakarta.enterprise.context.ApplicationScoped;
 
 /**
@@ -65,5 +67,19 @@ public class CompanyMapper {
         entity.symbol = dto.symbol();
         entity.website = dto.website();
         entity.email = dto.email();
+    }
+
+    public CompanyStockDto toCompanyStockDto(Company company, StockData stockData) {
+        return new CompanyStockDto(
+                company.id,
+                company.name,
+                company.country,
+                company.symbol,
+                company.website,
+                company.email,
+                company.createdAt,
+                stockData.marketCapitalization,
+                stockData.shareOutstanding
+        );
     }
 }

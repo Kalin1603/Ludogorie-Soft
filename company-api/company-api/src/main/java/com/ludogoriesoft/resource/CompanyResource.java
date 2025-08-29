@@ -1,6 +1,7 @@
 package com.ludogoriesoft.resource;
 
 import com.ludogoriesoft.dto.CompanyDto;
+import com.ludogoriesoft.dto.CompanyStockDto;
 import com.ludogoriesoft.service.CompanyService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -61,5 +62,18 @@ public class CompanyResource {
     public Response updateCompany(@PathParam("id") Long id, @Valid CompanyDto companyDto) {
         CompanyDto updatedCompany = companyService.updateCompany(id, companyDto);
         return Response.ok(updatedCompany).build();
+    }
+
+    /**
+     * Endpoint for getting combined company and stock data.
+     * The task description asked for /company-stocks/{companyId}, but a more RESTful
+     * convention is to identify the resource first, then the sub-resource.
+     * Corresponds to: GET /companies/{id}/stocks
+     */
+    @GET
+    @Path("/{id}/stocks")
+    public Response getCompanyWithStocks(@PathParam("id") Long id) {
+        CompanyStockDto companyStockData = companyService.getCompanyStockData(id);
+        return Response.ok(companyStockData).build();
     }
 }
