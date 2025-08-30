@@ -1,0 +1,12 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+        // Use the correct version from gradle.properties
+        id "io.quarkus" version "3.25.4"
+    }
+}
+
+rootProject.name='Ludogorie-Soft'
