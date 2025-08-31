@@ -31,7 +31,7 @@ public class StockData extends PanacheEntity {
     }
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     public Instant fetchedAt;
 
     // This is the core of the relationship. Many StockData records can belong to one Company.
