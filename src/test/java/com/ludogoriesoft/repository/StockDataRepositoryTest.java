@@ -75,7 +75,7 @@ class StockDataRepositoryTest {
 
         // ACT: Explicitly UPDATING the timestamp to the past.
         stockData.fetchedAt = Instant.now().minus(1, ChronoUnit.DAYS);
-        stockDataRepository.persist(stockData);
+
         stockDataRepository.flush(); // Force the UPDATE to the database.
 
         // ASSERT: The query for today's data should correctly find nothing.
