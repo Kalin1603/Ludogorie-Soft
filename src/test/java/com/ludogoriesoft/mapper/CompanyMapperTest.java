@@ -118,7 +118,8 @@ class CompanyMapperTest {
         // ASSERT: Verify the combined DTO contains all the correct data
         assertEquals(1L, result.id());
         assertEquals("Stock Corp", result.name());
-        assertEquals("UK", result.symbol());
+        assertEquals("UK", result.country());
+        assertEquals("STCK", result.symbol());
         assertEquals(5000.0, result.marketCapitalization());
         assertEquals(1234.0, result.shareOutstanding());
     }
