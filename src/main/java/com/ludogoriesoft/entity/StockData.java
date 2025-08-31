@@ -10,9 +10,25 @@ import java.time.Instant;
 @Table(name = "stock_data")
 public class StockData extends PanacheEntity {
 
-    public Double marketCapitalization;
+    private Double marketCapitalization;
 
-    public Double shareOutstanding;
+    private Double shareOutstanding;
+
+    public Double getMarketCapitalization() {
+        return marketCapitalization;
+    }
+
+    public void setMarketCapitalization(Double marketCapitalization) {
+        this.marketCapitalization = marketCapitalization;
+    }
+
+    public Double getShareOutstanding() {
+        return shareOutstanding;
+    }
+
+    public void setShareOutstanding(Double shareOutstanding) {
+        this.shareOutstanding = shareOutstanding;
+    }
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

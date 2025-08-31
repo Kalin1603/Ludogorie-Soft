@@ -78,8 +78,8 @@ public class CompanyMapper {
                 company.getWebsite(),
                 company.getEmail(),
                 company.getCreatedAt(),
-                stockData.marketCapitalization,
-                stockData.shareOutstanding
+                stockData.getMarketCapitalization(),
+                stockData.getShareOutstanding()
         );
     }
 }

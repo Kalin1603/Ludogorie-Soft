@@ -140,8 +140,8 @@ public class CompanyService {
             // 4. Create a NEW StockData entity to store the results. We never update old ones.
             StockData newStockData = new StockData();
             newStockData.company = company;
-            newStockData.marketCapitalization = finnhubData.marketCapitalization();
-            newStockData.shareOutstanding = finnhubData.shareOutstanding();
+            newStockData.setMarketCapitalization(finnhubData.marketCapitalization());
+            newStockData.setShareOutstanding(finnhubData.shareOutstanding());
 
             // 5. Save the new data to our database for future requests today.
             stockDataRepository.persist(newStockData);
