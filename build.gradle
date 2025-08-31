@@ -45,7 +45,14 @@ compileTestJava {
 }
 
 test {
+    finalizedBy jacocoTestReport // Ensures report is generated after tests run
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
-    // This is the "Quarkus Way" - it tells Quarkus to enable and manage JaCoCo itself
-    systemProperty "quarkus.test.jacoco.enabled", "true"
+}
+
+// STANDARD JACOCO REPORTING CONFIGURATION
+jacocoTestReport {
+    dependsOn test // Ensures report waits for tests to finish
+    reports {
+        xml.required = true // The format SonarCloud needs
+    }
 }
