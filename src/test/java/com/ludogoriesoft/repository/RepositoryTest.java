@@ -52,7 +52,7 @@ class RepositoryTest {
     // Tests for CompanyRepository
 
     @Test
-    void findBySymbol_shouldReturnCompany_whenSymbolExists() {
+    void testFindBySymbol_Found() {
         // ACT: Calling the custom query method
         Optional<Company> foundCompany = companyRepository.findBySymbol("RTST");
 
@@ -62,7 +62,7 @@ class RepositoryTest {
     }
 
     @Test
-    void findBySymbol_shouldReturnEmpty_whenSymbolDoesNotExist() {
+    void testFindBySymbol_NotFound() {
         // ACT: Calling the custom query with a symbol that doesn't exist
         Optional<Company> foundCompany = companyRepository.findBySymbol("NOSYMBOL");
 
@@ -74,7 +74,7 @@ class RepositoryTest {
 
     @Test
     @Transactional
-    void findLatestByCompanyIdForToday_shouldReturnData_whenPresentForToday() {
+    void testFindLatestForToday_Success() {
         // ARRANGE: Create stock data that was fetched today
         StockData stockData = new StockData();
         stockData.company = testCompany;
@@ -91,23 +91,27 @@ class RepositoryTest {
 
     @Test
     @Transactional
-    void findLatestByCompanyIdForToday_shouldReturnEmpty_whenDataIsFromYesterday() {
-        // ARRANGE: Creating stock data that was fetched yesterday
+    void testFindLatestForToday_IgnoresYesterdayData() {
+        // ARRANGE: First, persist the entity to let Hibernate set the timestamp
         StockData stockData = new StockData();
         stockData.company = testCompany;
-        stockData.fetchedAt = Instant.now().minus(1, ChronoUnit.DAYS); // Set timestamp to yesterday
         stockDataRepository.persist(stockData);
 
-        // ACT: Calling the custom query
+        // NOW, update the timestamp to yesterday. Because we are in a transaction,
+        // this change will be flushed to the database.
+        stockData.fetchedAt = Instant.now().minus(1, ChronoUnit.DAYS);
+        stockDataRepository.persist(stockData); // Persist the change
+
+        // ACT
         Optional<StockData> foundData = stockDataRepository.findLatestByCompanyIdForToday(testCompany.id);
 
-        // ASSERT: Verifying that nothing was found for today
+        // ASSERT
         assertTrue(foundData.isEmpty());
     }
 
     @Test
     @Transactional
-    void findLatestByCompanyIdForToday_shouldReturnLatest_whenMultipleEntriesExistForToday() {
+    void testFindLatestForToday_ReturnsNewestEntry() {
         // ARRANGE: Creating two entries for today, one older and one newer
         StockData oldStockData = new StockData();
         oldStockData.company = testCompany;
