@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @QuarkusTest
@@ -46,7 +48,7 @@ class CompanyResourceTest {
         company.setCountry("US");
         company.setSymbol("TC");
         companyRepository.persist(company);
-        testCompanyId = company.id; // Store the ID for other tests
+        testCompanyId = company.id; // The ID for other tests
     }
 
     @AfterEach
@@ -103,9 +105,9 @@ class CompanyResourceTest {
     // NEW TEST FOR THE GET /STOCKS ENDPOINT
     @Test
     void testGetCompanyWithStocksEndpoint() {
-        // ARRANGE: Mock the external Finnhub API call
+        // ARRANGE: Mock the external Finnhub API call with ARGUMENT MATCHERS
         FinnhubProfileDto mockFinnhubResponse = new FinnhubProfileDto(2500.0, 100.0);
-        when(finnhubClient.getCompanyProfile("TC", null)).thenReturn(mockFinnhubResponse);
+        when(finnhubClient.getCompanyProfile(eq("TC"), anyString())).thenReturn(mockFinnhubResponse);
 
         // ACT & ASSERT
         given()
