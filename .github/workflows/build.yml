@@ -17,13 +17,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # DEBUGGING STEP
-      - name: Verify Content of StockData.java
-        run: |
-          echo "--- Verifying file content ---"
-          cat src/main/java/com/ludogoriesoft/entity/StockData.java
-          echo "----------------------------"
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -41,8 +34,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+          key: ${{ runner.os }}-gradle-v2-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-v2-
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
