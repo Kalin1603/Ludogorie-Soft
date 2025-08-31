@@ -110,10 +110,12 @@ class CompanyServiceTest {
     @Test
     void updateCompany_shouldThrowNotFound_whenIdDoesNotExist() {
         // ARRANGE
+        long nonExistentId = 99L;
+        CompanyDto dummyDto = new CompanyDto(null, null, null, null, null, null, null);
         when(companyRepository.findByIdOptional(anyLong())).thenReturn(Optional.empty());
 
-        // ACT & ASSERT
-        assertThrows(NotFoundException.class, () -> companyService.updateCompany(99L, new CompanyDto(null, null, null, null, null, null, null)));
+        // ACT & ASSERT: The lambda now has only one invocation.
+        assertThrows(NotFoundException.class, () -> companyService.updateCompany(nonExistentId, dummyDto));
     }
 
     @Test
