@@ -35,9 +35,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-test {
-    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
-}
 compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << '-parameters'
@@ -48,17 +45,7 @@ compileTestJava {
 }
 
 test {
-    // This line ensures that after the 'test' task finishes, the 'jacocoTestReport' task is always run.
-    finalizedBy jacocoTestReport
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
-}
-
-jacocoTestReport {
-    // This line ensures that the report is only generated after the tests have successfully run.
-    dependsOn test
-
-    reports {
-        // This guarantees that the XML file SonarCloud needs is always created.
-        xml.required = true
-    }
+    // This is the "Quarkus Way" - it tells Quarkus to enable and manage JaCoCo itself
+    systemProperty "quarkus.test.jacoco.enabled", "true"
 }
