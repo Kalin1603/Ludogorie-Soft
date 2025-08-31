@@ -17,7 +17,6 @@ import java.time.Instant;
 @Table(name = "companies")
 public class Company extends PanacheEntity {
 
-    // All fields are now private to enforce encapsulation
     @Column(nullable = false)
     private String name;
 

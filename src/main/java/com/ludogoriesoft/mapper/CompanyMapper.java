@@ -23,11 +23,11 @@ public class CompanyMapper {
             return null;
         }
         Company company = new Company();
-        company.name = dto.name();
-        company.country = dto.country();
-        company.symbol = dto.symbol();
-        company.website = dto.website();
-        company.email = dto.email();
+        company.setName(dto.name());
+        company.setCountry(dto.country());
+        company.setSymbol(dto.symbol());
+        company.setWebsite(dto.website());
+        company.setEmail(dto.email());
         return company;
     }
 
@@ -41,12 +41,12 @@ public class CompanyMapper {
         }
         return new CompanyDto(
                 entity.id,
-                entity.name,
-                entity.country,
-                entity.symbol,
-                entity.website,
-                entity.email,
-                entity.createdAt
+                entity.getName(),
+                entity.getCountry(),
+                entity.getSymbol(),
+                entity.getWebsite(),
+                entity.getEmail(),
+                entity.getCreatedAt()
         );
     }
 
@@ -62,22 +62,22 @@ public class CompanyMapper {
         }
         // We only update the fields that are allowed to be changed.
         // 'id' and 'createdAt' are never updated from an incoming request.
-        entity.name = dto.name();
-        entity.country = dto.country();
-        entity.symbol = dto.symbol();
-        entity.website = dto.website();
-        entity.email = dto.email();
+        entity.setName(dto.name());
+        entity.setCountry(dto.country());
+        entity.setSymbol(dto.symbol());
+        entity.setWebsite(dto.website());
+        entity.setEmail(dto.email());
     }
 
     public CompanyStockDto toCompanyStockDto(Company company, StockData stockData) {
         return new CompanyStockDto(
                 company.id,
-                company.name,
-                company.country,
-                company.symbol,
-                company.website,
-                company.email,
-                company.createdAt,
+                company.getName(),
+                company.getCountry(),
+                company.getSymbol(),
+                company.getWebsite(),
+                company.getEmail(),
+                company.getCreatedAt(),
                 stockData.marketCapitalization,
                 stockData.shareOutstanding
         );
