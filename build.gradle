@@ -46,3 +46,19 @@ compileJava {
 compileTestJava {
     options.encoding = 'UTF-8'
 }
+
+test {
+    // This line ensures that after the 'test' task finishes, the 'jacocoTestReport' task is always run.
+    finalizedBy jacocoTestReport
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+
+jacocoTestReport {
+    // This line ensures that the report is only generated after the tests have successfully run.
+    dependsOn test
+
+    reports {
+        // This guarantees that the XML file SonarCloud needs is always created.
+        xml.required = true
+    }
+}
