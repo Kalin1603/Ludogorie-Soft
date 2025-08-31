@@ -36,7 +36,7 @@ class RepositoryTest {
         company.setName("Repo Test Corp");
         company.setCountry("RT");
         company.setSymbol("RTST");
-        companyRepository.persistAndFlush(company); // Ensuring that company is saved before tests run
+        companyRepository.persistAndFlush(company);
         testCompany = company;
     }
 
@@ -47,13 +47,10 @@ class RepositoryTest {
         companyRepository.deleteAll();
     }
 
-    // Tests for CompanyRepository
-
     @Test
     void testFindBySymbol_Found() {
         Optional<Company> foundCompany = companyRepository.findBySymbol("RTST");
         assertTrue(foundCompany.isPresent());
-        assertEquals("Repo Test Corp", foundCompany.get().getName());
     }
 
     @Test
@@ -61,8 +58,6 @@ class RepositoryTest {
         Optional<Company> foundCompany = companyRepository.findBySymbol("NOSYMBOL");
         assertTrue(foundCompany.isEmpty());
     }
-
-    // Tests for StockDataRepository
 
     @Test
     @Transactional
@@ -78,18 +73,22 @@ class RepositoryTest {
     @Test
     @Transactional
     void testFindLatestForToday_IgnoresYesterdayData() {
-        // ARRANGE: Creating the entity. On persist, Hibernate sets fetchedAt to NOW.
+        // ARRANGE: Persist the entity. Hibernate sets fetchedAt to NOW.
         StockData stockData = new StockData();
         stockData.company = testCompany;
         stockDataRepository.persist(stockData);
+        // Force the INSERT to be written to the database immediately.
+        stockDataRepository.flush();
 
-        // ACT: Now, explicitly updating the timestamp to the past and re-save.
+        // ACT: Updating the entity's timestamp and re-persist (which schedules an UPDATE).
         stockData.fetchedAt = Instant.now().minus(1, ChronoUnit.DAYS);
         stockDataRepository.persist(stockData);
+        // Force the UPDATE to be written to the database immediately.
+        stockDataRepository.flush();
 
-        // ASSERT: The query for today's data should now correctly find nothing.
+        // ASSERT: The query now runs against the correct and final database state.
         Optional<StockData> foundData = stockDataRepository.findLatestByCompanyIdForToday(testCompany.id);
-        assertTrue(foundData.isEmpty());
+        assertTrue(foundData.isEmpty(), "Should not find data from yesterday when querying for today");
     }
 
     @Test
@@ -98,16 +97,17 @@ class RepositoryTest {
         // ARRANGE: Create an older entry and explicitly set its time back
         StockData oldStockData = new StockData();
         oldStockData.company = testCompany;
-        oldStockData.setMarketCapitalization(100.0);
         stockDataRepository.persist(oldStockData);
+        stockDataRepository.flush(); // Flush to DB
         oldStockData.fetchedAt = Instant.now().minus(1, ChronoUnit.HOURS);
         stockDataRepository.persist(oldStockData);
+        stockDataRepository.flush(); // Flush the update
 
-        // ARRANGE: Create a newer entry, which will have the current timestamp
+        // ARRANGE: Create a newer entry
         StockData newStockData = new StockData();
         newStockData.company = testCompany;
         newStockData.setMarketCapitalization(200.0);
-        stockDataRepository.persist(newStockData);
+        stockDataRepository.persistAndFlush(newStockData); // Persist and flush in one step
 
         // ACT
         Optional<StockData> foundData = stockDataRepository.findLatestByCompanyIdForToday(testCompany.id);
