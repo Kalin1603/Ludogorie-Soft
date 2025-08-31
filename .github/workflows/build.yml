@@ -49,3 +49,4 @@ jobs:
           -Dsonar.projectKey=Kalin1603_Ludogorie-Soft
           -Dsonar.organization=kalin1603
           -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
