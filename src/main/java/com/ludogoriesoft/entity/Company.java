@@ -10,33 +10,73 @@ import java.time.Instant;
 
 /**
  * Represents a company entity that will be mapped to the 'companies' table in the database.
- * By extending PanacheEntity, we automatically get an 'id' field of type Long,
- * along with many useful, simplified data access methods.
+ * By extending PanacheEntity, we automatically get an 'id' field of type Long.
+ * This entity follows the standard JavaBean pattern with private fields and public accessors.
  */
 @Entity
 @Table(name = "companies")
 public class Company extends PanacheEntity {
 
-    // Mandatory properties as per the requirements
-
+    // All fields are now private to enforce encapsulation
     @Column(nullable = false)
-    public String name;
+    private String name;
 
     @Column(length = 2, nullable = false)
-    public String country;
+    private String country;
 
     @Column(unique = true, nullable = false)
-    public String symbol;
+    private String symbol;
 
-    // Optional properties
+    private String website;
 
-    public String website;
-
-    public String email;
+    private String email;
 
     // A mandatory, auto-generated timestamp
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    public Instant createdAt;
+    private Instant createdAt;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }
