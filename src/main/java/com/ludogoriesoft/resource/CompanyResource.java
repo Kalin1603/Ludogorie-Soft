@@ -21,8 +21,11 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class CompanyResource {
 
-    @Inject
-    CompanyService companyService;
+    private final CompanyService companyService;
+
+    public CompanyResource(CompanyService companyService) {
+        this.companyService = companyService;
+    }
 
     /**
      * Endpoint for creating a new company.

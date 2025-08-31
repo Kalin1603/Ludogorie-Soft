@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,22 +33,23 @@ public class CompanyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompanyService.class);
 
-    @Inject
-    CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
+    private final CompanyMapper companyMapper;
+    private final StockDataRepository stockDataRepository;
+    private final FinnhubClient finnhubClient;
+    private final String finnhubApiKey;
 
-    @Inject
-    CompanyMapper companyMapper;
-
-    @Inject
-    StockDataRepository stockDataRepository;
-
-    @Inject
-    @RestClient
-    FinnhubClient finnhubClient;
-
-    // This is used to inject the API key from application.properties
-    @org.eclipse.microprofile.config.inject.ConfigProperty(name = "finnhub.api.key")
-    String finnhubApiKey;
+    public CompanyService(CompanyRepository companyRepository,
+                          CompanyMapper companyMapper,
+                          StockDataRepository stockDataRepository,
+                          @RestClient FinnhubClient finnhubClient,
+                          @ConfigProperty(name = "finnhub.api.key") String finnhubApiKey) {
+        this.companyRepository = companyRepository;
+        this.companyMapper = companyMapper;
+        this.stockDataRepository = stockDataRepository;
+        this.finnhubClient = finnhubClient;
+        this.finnhubApiKey = finnhubApiKey;
+    }
 
     /**
      * Creates a new company in the database.
