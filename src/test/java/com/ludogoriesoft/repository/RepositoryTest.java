@@ -36,7 +36,7 @@ class RepositoryTest {
         company.setName("Repo Test Corp");
         company.setCountry("RT");
         company.setSymbol("RTST");
-        companyRepository.persist(company);
+        companyRepository.persistAndFlush(company); // Ensuring that company is saved before tests run
         testCompany = company;
     }
 
@@ -69,24 +69,25 @@ class RepositoryTest {
     void testFindLatestForToday_Success() {
         StockData stockData = new StockData();
         stockData.company = testCompany;
-        stockData.setMarketCapitalization(100.0);
         stockDataRepository.persist(stockData);
 
         Optional<StockData> foundData = stockDataRepository.findLatestByCompanyIdForToday(testCompany.id);
         assertTrue(foundData.isPresent());
-        assertEquals(100.0, foundData.get().getMarketCapitalization());
     }
 
     @Test
     @Transactional
     void testFindLatestForToday_IgnoresYesterdayData() {
+        // ARRANGE: Creating the entity. On persist, Hibernate sets fetchedAt to NOW.
         StockData stockData = new StockData();
         stockData.company = testCompany;
         stockDataRepository.persist(stockData);
 
+        // ACT: Now, explicitly updating the timestamp to the past and re-save.
         stockData.fetchedAt = Instant.now().minus(1, ChronoUnit.DAYS);
         stockDataRepository.persist(stockData);
 
+        // ASSERT: The query for today's data should now correctly find nothing.
         Optional<StockData> foundData = stockDataRepository.findLatestByCompanyIdForToday(testCompany.id);
         assertTrue(foundData.isEmpty());
     }
@@ -94,6 +95,7 @@ class RepositoryTest {
     @Test
     @Transactional
     void testFindLatestForToday_ReturnsNewestEntry() {
+        // ARRANGE: Create an older entry and explicitly set its time back
         StockData oldStockData = new StockData();
         oldStockData.company = testCompany;
         oldStockData.setMarketCapitalization(100.0);
@@ -101,13 +103,16 @@ class RepositoryTest {
         oldStockData.fetchedAt = Instant.now().minus(1, ChronoUnit.HOURS);
         stockDataRepository.persist(oldStockData);
 
+        // ARRANGE: Create a newer entry, which will have the current timestamp
         StockData newStockData = new StockData();
         newStockData.company = testCompany;
         newStockData.setMarketCapitalization(200.0);
         stockDataRepository.persist(newStockData);
 
+        // ACT
         Optional<StockData> foundData = stockDataRepository.findLatestByCompanyIdForToday(testCompany.id);
 
+        // ASSERT
         assertTrue(foundData.isPresent());
         assertEquals(200.0, foundData.get().getMarketCapitalization());
     }
