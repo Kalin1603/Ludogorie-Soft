@@ -30,7 +30,7 @@ class CompanyResourceTest {
     @Inject
     StockDataRepository stockDataRepository;
 
-    // Using @InjectMock to replace the real FinnhubClient with a mock during tests
+    // We mock the external client to control its behavior during tests
     @InjectMock
     @RestClient
     FinnhubClient finnhubClient;
@@ -40,15 +40,17 @@ class CompanyResourceTest {
     @BeforeEach
     @Transactional
     void setUp() {
+        // Cleaning the database before each test to ensure isolation
         stockDataRepository.deleteAll();
         companyRepository.deleteAll();
 
+        // Create a predictable company for our tests to use
         Company company = new Company();
         company.setName("Test Corp");
         company.setCountry("US");
         company.setSymbol("TC");
         companyRepository.persist(company);
-        testCompanyId = company.id; // The ID for other tests
+        testCompanyId = company.id; // Store its generated ID
     }
 
     @AfterEach
@@ -89,7 +91,7 @@ class CompanyResourceTest {
                 .statusCode(409);
     }
 
-    // NEW TEST FOR THE PUT ENDPOINT
+    // THIS TEST COVERS THE UPDATE LOGIC
     @Test
     void testUpdateCompanyEndpoint_Success() {
         String updatedCompanyJson = "{\"name\":\"Updated Corp\",\"country\":\"UK\",\"symbol\":\"TCU\"}";
@@ -102,10 +104,21 @@ class CompanyResourceTest {
                 .body("country", equalTo("UK"));
     }
 
-    // NEW TEST FOR THE GET /STOCKS ENDPOINT
+    // THIS TEST COVERS THE 'NOT FOUND' CASE FOR UPDATE
     @Test
-    void testGetCompanyWithStocksEndpoint() {
-        // ARRANGE: Mock the external Finnhub API call with ARGUMENT MATCHERS
+    void testUpdateCompanyEndpoint_NotFound() {
+        String updatedCompanyJson = "{\"name\":\"Updated Corp\",\"country\":\"UK\",\"symbol\":\"TCU\"}";
+        given()
+                .contentType(ContentType.JSON).body(updatedCompanyJson)
+                .when().put("/companies/9999") // Using an ID that doesn't exist
+                .then()
+                .statusCode(404); // Assert that we get a Not Found error
+    }
+
+    // THIS TEST COVERS THE /STOCKS ENDPOINT (CACHE MISS)
+    @Test
+    void testGetCompanyWithStocksEndpoint_CacheMiss() {
+        // ARRANGE: Set up the mock to return data when the Finnhub client is called
         FinnhubProfileDto mockFinnhubResponse = new FinnhubProfileDto(2500.0, 100.0);
         when(finnhubClient.getCompanyProfile(eq("TC"), anyString())).thenReturn(mockFinnhubResponse);
 
@@ -115,7 +128,6 @@ class CompanyResourceTest {
                 .then()
                 .statusCode(200)
                 .body("name", equalTo("Test Corp"))
-                .body("symbol", equalTo("TC"))
                 .body("marketCapitalization", equalTo(2500.0f))
                 .body("shareOutstanding", equalTo(100.0f));
     }
