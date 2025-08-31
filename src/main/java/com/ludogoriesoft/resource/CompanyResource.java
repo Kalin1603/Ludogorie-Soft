@@ -3,7 +3,6 @@ package com.ludogoriesoft.resource;
 import com.ludogoriesoft.dto.CompanyDto;
 import com.ludogoriesoft.dto.CompanyStockDto;
 import com.ludogoriesoft.service.CompanyService;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

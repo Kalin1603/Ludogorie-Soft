@@ -10,7 +10,6 @@ import com.ludogoriesoft.mapper.CompanyMapper;
 import com.ludogoriesoft.repository.CompanyRepository;
 import com.ludogoriesoft.repository.StockDataRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
@@ -88,7 +87,7 @@ public class CompanyService {
         // 2. Use a Java Stream to map each entity to a DTO
         return companies.stream()
                 .map(companyMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
