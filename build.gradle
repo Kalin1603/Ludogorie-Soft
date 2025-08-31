@@ -43,10 +43,3 @@ compileJava {
 compileTestJava {
     options.encoding = 'UTF-8'
 }
-
-sonar {
-    properties {
-        property "sonar.projectKey", "Kalin1603_Ludogorie-Soft"
-        property "sonar.organization", "kalin1603"
-    }
-}
