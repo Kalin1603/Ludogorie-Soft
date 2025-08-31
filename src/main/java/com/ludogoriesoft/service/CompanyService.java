@@ -135,7 +135,7 @@ public class CompanyService {
         } else {
             // 3b. CACHE MISS: No data for today. Call the external Finnhub API.
             LOGGER.info("CACHE MISS for company ID: {}. Calling Finnhub API.", companyId);
-            FinnhubProfileDto finnhubData = finnhubClient.getCompanyProfile(company.symbol, finnhubApiKey);
+            FinnhubProfileDto finnhubData = finnhubClient.getCompanyProfile(company.getSymbol(), finnhubApiKey);
 
             // 4. Create a NEW StockData entity to store the results. We never update old ones.
             StockData newStockData = new StockData();
