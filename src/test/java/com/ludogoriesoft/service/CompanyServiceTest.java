@@ -148,7 +148,7 @@ class CompanyServiceTest {
         // ARRANGE (Cache Miss)
         Company company = new Company();
         company.setSymbol("API");
-        FinnhubProfileDto apiResponse = new FinnhubProfileDto(500.0, 200.0);
+        FinnhubProfileDto apiResponse = new FinnhubProfileDto(500.0, 200.0, "Some Name", "Some Country", "Some Symbol");
         when(companyRepository.findByIdOptional(1L)).thenReturn(Optional.of(company));
         when(stockDataRepository.findLatestByCompanyIdForToday(1L)).thenReturn(Optional.empty());
         when(finnhubClient.getCompanyProfile(eq("API"), anyString())).thenReturn(apiResponse);

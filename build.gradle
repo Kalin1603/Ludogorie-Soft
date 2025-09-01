@@ -24,7 +24,6 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
-    testImplementation 'io.quarkus:quarkus-jdbc-h2'
 }
 
 group = 'com.ludogoriesoft'
@@ -45,8 +44,22 @@ compileTestJava {
 }
 
 test {
-    finalizedBy jacocoTestReport // Ensures report is generated after tests run
-    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+    // This is the crucial part. It finds .env, reads it, and adds
+    // all its key-value pairs as system properties for the test JVM.
+    File envFile = rootProject.file('.env')
+    if (envFile.exists()) {
+        Properties envProps = new Properties()
+        envFile.withInputStream { stream -> envProps.load(stream) }
+        systemProperties(envProps)
+        println "Loaded .env file for testing." // A handy message to confirm it's working
+    } else {
+        println "No .env file found for testing."
+    }
+
+    // This ensures any other system properties are also passed along
+    systemProperties(System.getProperties())
+
+    finalizedBy jacocoTestReport
 }
 
 // STANDARD JACOCO REPORTING CONFIGURATION

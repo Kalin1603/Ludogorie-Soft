@@ -11,7 +11,6 @@ import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,23 +23,24 @@ import static org.mockito.Mockito.when;
 @QuarkusTest
 class CompanyResourceTest {
 
+    // Mocking the external client because the purpose of this test is to verify
+    // our application's endpoints against a real database, not the external API.
+    @InjectMock
+    @RestClient
+    FinnhubClient finnhubClient;
+
     @Inject
     CompanyRepository companyRepository;
 
     @Inject
     StockDataRepository stockDataRepository;
 
-    // We mock the external client to control its behavior during tests
-    @InjectMock
-    @RestClient
-    FinnhubClient finnhubClient;
-
     private Long testCompanyId;
 
     @BeforeEach
     @Transactional
     void setUp() {
-        // Cleaning the database before each test to ensure isolation
+        // To respect foreign key constraints, we must delete the "child" records (StockData) before deleting the "parent" records (Company).
         stockDataRepository.deleteAll();
         companyRepository.deleteAll();
 
@@ -49,16 +49,13 @@ class CompanyResourceTest {
         company.setName("Test Corp");
         company.setCountry("US");
         company.setSymbol("TC");
-        companyRepository.persist(company);
+        company.persist();
         testCompanyId = company.id; // Store its generated ID
     }
 
-    @AfterEach
-    @Transactional
-    void tearDown() {
-        stockDataRepository.deleteAll();
-        companyRepository.deleteAll();
-    }
+    // NOTE: An @AfterEach block is no longer needed because the @Transactional
+    // annotation on setUp() will roll back the transaction after each test,
+    // and 'drop-and-create' handles the schema between full test runs.
 
     @Test
     void testGetAllCompaniesEndpoint() {
@@ -91,7 +88,6 @@ class CompanyResourceTest {
                 .statusCode(409);
     }
 
-    // THIS TEST COVERS THE UPDATE LOGIC
     @Test
     void testUpdateCompanyEndpoint_Success() {
         String updatedCompanyJson = "{\"name\":\"Updated Corp\",\"country\":\"UK\",\"symbol\":\"TCU\"}";
@@ -104,7 +100,6 @@ class CompanyResourceTest {
                 .body("country", equalTo("UK"));
     }
 
-    // THIS TEST COVERS THE 'NOT FOUND' CASE FOR UPDATE
     @Test
     void testUpdateCompanyEndpoint_NotFound() {
         String updatedCompanyJson = "{\"name\":\"Updated Corp\",\"country\":\"UK\",\"symbol\":\"TCU\"}";
@@ -115,11 +110,10 @@ class CompanyResourceTest {
                 .statusCode(404); // Assert that we get a Not Found error
     }
 
-    // THIS TEST COVERS THE /STOCKS ENDPOINT (CACHE MISS)
     @Test
     void testGetCompanyWithStocksEndpoint_CacheMiss() {
         // ARRANGE: Set up the mock to return data when the Finnhub client is called
-        FinnhubProfileDto mockFinnhubResponse = new FinnhubProfileDto(2500.0, 100.0);
+        FinnhubProfileDto mockFinnhubResponse = new FinnhubProfileDto(2500.0, 100.0, "Test Corp", "US", "TC");
         when(finnhubClient.getCompanyProfile(eq("TC"), anyString())).thenReturn(mockFinnhubResponse);
 
         // ACT & ASSERT
