@@ -1,5 +1,6 @@
 package com.ludogoriesoft.resource;
 
+import com.ludogoriesoft.DatabaseTestBase;
 import com.ludogoriesoft.client.FinnhubClient;
 import com.ludogoriesoft.dto.FinnhubProfileDto;
 import com.ludogoriesoft.entity.Company;
@@ -21,7 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @QuarkusTest
-class CompanyResourceTest {
+class CompanyResourceTest extends DatabaseTestBase {
 
     // Mocking the external client because the purpose of this test is to verify
     // our application's endpoints against a real database, not the external API.

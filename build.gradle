@@ -24,6 +24,9 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
+    testImplementation("org.testcontainers:testcontainers:1.19.7")
+    testImplementation("org.testcontainers:postgresql:1.19.7")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.7")
 }
 
 group = 'com.ludogoriesoft'
@@ -44,8 +47,7 @@ compileTestJava {
 }
 
 test {
-    // This is the crucial part. It finds .env, reads it, and adds
-    // all its key-value pairs as system properties for the test JVM.
+    // It finds .env, reads it, and adds all its key-value pairs as system properties for the test JVM.
     File envFile = rootProject.file('.env')
     if (envFile.exists()) {
         Properties envProps = new Properties()

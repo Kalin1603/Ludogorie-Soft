@@ -20,7 +20,7 @@ class FinnhubClientIT {
     @RestClient
     FinnhubClient finnhubClient;
 
-    // This property is INJECTED from your .env file and MUST be a VALID key.
+    // This property is INJECTED from .env file and MUST be a VALID key.
     @ConfigProperty(name = "finnhub.api.key")
     String validApiKeyFromEnv;
 
